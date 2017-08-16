@@ -23,37 +23,23 @@ with open('table/final') as f:
     for index in range(len(lines)):
         final[lines[index]] = index
 
+def collect(string, buf):
+    for init in pypinyin.pinyin(string, style=pypinyin.INITIALS, errors='ignore'):
+        k = convert[init[0]] if init[0] in convert else init[0]
+        if k in initial:
+            buf[initial[k]] += 1
+
+    for init in pypinyin.pinyin(string, style=pypinyin.FINALS, errors='ignore'):
+        k = convert[init[0]] if init[0] in convert else init[0]
+        if k in initial:
+            buf[final[k] + len(initial)] += 1
+
 def score(str1, str2):
     key = [0] * 39
     usr = [0] * 39
 
-    for init in pypinyin.pinyin(str1, style=pypinyin.INITIALS, errors='ignore'):
-        k = init[0]
-        if k in convert:
-            k = convert[k]
-        if k in initial:
-            key[initial[k]] += 1
-
-    for init in pypinyin.pinyin(str2, style=pypinyin.INITIALS, errors='ignore'):
-        k = init[0]
-        if k in convert:
-            k = convert[k]
-        if k in initial:
-            usr[initial[k]] += 1
-
-    for init in pypinyin.pinyin(str1, style=pypinyin.FINALS, errors='ignore'):
-        k = init[0]
-        if k in convert:
-            k = convert[k]
-        if k in final:
-            key[final[k] + len(initial)] += 1
-
-    for init in pypinyin.pinyin(str2, style=pypinyin.FINALS, errors='ignore'):
-        k = init[0]
-        if k in convert:
-            k = convert[k]
-        if k in final:
-            usr[final[k] + len(initial)] += 1
+    collect(str1, key)
+    collect(str2, usr)
 
     same = 0
     for i in range(len(key)):
